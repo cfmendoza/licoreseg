@@ -1,0 +1,6 @@
+{
+    "Usuarios": true,
+    "Reportes": true,
+    "Ventas": true,
+    "Inventario": true
+}
