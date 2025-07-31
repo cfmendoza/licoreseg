@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: licoreseg
+    env: docker
+    plan: free
+    region: oregon
+    branch: main
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: base64:qfYxbB3tPPp6P6v1syZBbCUSXiL72Rj/twMwEeGLVDw=
+        value: base64:xxxxxxxxxxxxxxxxxxxxxx
+      - key: APP_DEBUG
+        value: false
+      - key: APP_URL
+        value: https://licoreseg.onrender.com
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        value: db4free.net
+      - key: DB_PORT
+        value: 3306
+      - key: DB_DATABASE
+        value: tu_base_de_datos
+      - key: DB_USERNAME
+        value: tu_usuario
+      - key: DB_PASSWORD
+        value: tu_contraseña
