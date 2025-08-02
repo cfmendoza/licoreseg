@@ -8,14 +8,15 @@ RUN apt-get update && apt-get install -y \
 # Habilita mod_rewrite de Apache
 RUN a2enmod rewrite
 
-# Copia composer y ejecuta install
-COPY composer.json composer.lock /var/www/html/
+# Establece el directorio de trabajo
 WORKDIR /var/www/html
+
+# Copia TODO el proyecto primero
+COPY . .
+
+# Instala Composer y las dependencias (ya existe artisan en este punto)
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && composer install --no-interaction --prefer-dist --optimize-autoloader
-
-# Ahora copia todo
-COPY . /var/www/html
 
 # Permisos
 RUN chown -R www-data:www-data /var/www/html \
