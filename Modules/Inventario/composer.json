@@ -1,30 +1,28 @@
 {
-    "name": "nwidart/inventario",
-    "description": "",
-    "authors": [
-        {
-            "name": "Nicolas Widart",
-            "email": "n.widart@gmail.com"
-        }
-    ],
-    "extra": {
-        "laravel": {
-            "providers": [],
-            "aliases": {
-
-            }
-        }
-    },
-    "autoload": {
-        "psr-4": {
-            "Modules\\Inventario\\": "app/",
-            "Modules\\Inventario\\Database\\Factories\\": "database/factories/",
-            "Modules\\Inventario\\Database\\Seeders\\": "database/seeders/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Modules\\Inventario\\Tests\\": "tests/"
-        }
+  "name": "nwidart/inventario",
+  "description": "",
+  "authors": [
+    {
+      "name": "Nicolas Widart",
+      "email": "n.widart@gmail.com"
     }
+  ],
+  "extra": {
+    "laravel": {
+      "providers": [],
+      "aliases": {}
+    }
+  },
+ "autoload": {
+    "psr-4": {
+      "Modules\\Inventario\\": "", 
+      "Modules\\Inventario\\Database\\Factories\\": "Database/Factories/",
+      "Modules\\Inventario\\Database\\Seeders\\": "Database/Seeders/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Modules\\Inventario\\Tests\\": "Tests/"
+    }
+  }
 }
