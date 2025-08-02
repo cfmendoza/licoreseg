@@ -1,29 +1,29 @@
-# Usa imagen oficial PHP con Apache
 FROM php:8.2-apache
 
-# Instala extensiones necesarias
+# Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
-    libzip-dev unzip git curl libpng-dev libonig-dev libxml2-dev zip \
+    git unzip zip curl libzip-dev libpng-dev libonig-dev libxml2-dev libpq-dev libjpeg-dev libfreetype6-dev \
     && docker-php-ext-install pdo pdo_mysql zip gd
 
-# Habilita mod_rewrite para Laravel
+# Habilitar mod_rewrite de Apache
 RUN a2enmod rewrite
 
-# Copia archivos del proyecto
+# Copiar todo el proyecto al contenedor
 COPY . /var/www/html
 
-# Establece el directorio de trabajo
+# Establecer el directorio público como raíz
 WORKDIR /var/www/html
 
-# Asigna permisos correctos
+# Dar permisos
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
-# Copia Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Instala dependencias
-RUN composer install --no-interaction --optimize-autoloader
-
-# Expone el puerto 80
-EXPOSE 80
+# Configurar el VirtualHost
+RUN echo '<VirtualHost *:80>\n\
+    DocumentRoot /var/www/html/public\n\
+    <Directory /var/www/html/public>\n\
+        Options Indexes FollowSymLinks\n\
+        AllowOverride All\n\
+        Require all granted\n\
+    </Directory>\n\
+</VirtualHost>' > /etc/apache2/sites-available/000-default.conf
