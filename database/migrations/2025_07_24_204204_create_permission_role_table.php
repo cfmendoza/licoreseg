@@ -6,34 +6,80 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create(env('DB_SINTAX') . 'permission_role', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('permission_id');
-            $table->unsignedBigInteger('role_id');
+        $prefix = env('DB_SINTAX', '');
+
+        Schema::create($prefix . 'permissions', static function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('name');
+            $table->string('guard_name');
             $table->timestamps();
+            $table->unique(['name', 'guard_name']);
+        });
+
+        Schema::create($prefix . 'roles', static function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->string('name');
+            $table->string('guard_name');
+            $table->timestamps();
+            $table->unique(['name', 'guard_name']);
+        });
+
+        Schema::create($prefix . 'model_has_permissions', static function (Blueprint $table) use ($prefix) {
+            $table->unsignedBigInteger('permission_id');
+            $table->string('model_type');
+            $table->unsignedBigInteger('model_id');
+            $table->index(['model_id', 'model_type'], $prefix . 'model_has_permissions_model_id_model_type_index');
 
             $table->foreign('permission_id')
                 ->references('id')
-                ->on(env('DB_SINTAX') . 'permissions')
+                ->on($prefix . 'permissions')
+                ->onDelete('cascade');
+
+            $table->primary(['permission_id', 'model_id', 'model_type'], $prefix . 'model_has_permissions_primary');
+        });
+
+        Schema::create($prefix . 'model_has_roles', static function (Blueprint $table) use ($prefix) {
+            $table->unsignedBigInteger('role_id');
+            $table->string('model_type');
+            $table->unsignedBigInteger('model_id');
+            $table->index(['model_id', 'model_type'], $prefix . 'model_has_roles_model_id_model_type_index');
+
+            $table->foreign('role_id')
+                ->references('id')
+                ->on($prefix . 'roles')
+                ->onDelete('cascade');
+
+            $table->primary(['role_id', 'model_id', 'model_type'], $prefix . 'model_has_roles_primary');
+        });
+
+        Schema::create($prefix . 'role_has_permissions', static function (Blueprint $table) use ($prefix) {
+            $table->unsignedBigInteger('permission_id');
+            $table->unsignedBigInteger('role_id');
+
+            $table->foreign('permission_id')
+                ->references('id')
+                ->on($prefix . 'permissions')
                 ->onDelete('cascade');
 
             $table->foreign('role_id')
                 ->references('id')
-                ->on(env('DB_SINTAX') . 'roles')
+                ->on($prefix . 'roles')
                 ->onDelete('cascade');
-                });
+
+            $table->primary(['permission_id', 'role_id'], $prefix . 'role_has_permissions_primary');
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists(env('DB_SINTAX') . 'permission_role');
+        $prefix = env('DB_SINTAX', '');
+
+        Schema::dropIfExists($prefix . 'role_has_permissions');
+        Schema::dropIfExists($prefix . 'model_has_roles');
+        Schema::dropIfExists($prefix . 'model_has_permissions');
+        Schema::dropIfExists($prefix . 'roles');
+        Schema::dropIfExists($prefix . 'permissions');
     }
 };
