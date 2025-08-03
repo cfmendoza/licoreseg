@@ -6,12 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    protected string $prefix;
+
+    public function __construct()
+    {
+        $this->prefix = env('DB_SINTAX', '');
+    }
+
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::table(env('DB_SINTAX') . 'users', function (Blueprint $table) {
+        Schema::table($this->prefix . 'users', function (Blueprint $table) {
             $table->text('two_factor_secret')
                 ->after('password')
                 ->nullable();
@@ -31,7 +38,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table(env('DB_SINTAX') . 'users', function (Blueprint $table) {
+        Schema::table($this->prefix . 'users', function (Blueprint $table) {
             $table->dropColumn([
                 'two_factor_secret',
                 'two_factor_recovery_codes',

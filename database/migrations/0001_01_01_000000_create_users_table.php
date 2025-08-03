@@ -6,12 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    protected string $prefix;
+
+    public function __construct()
+    {
+        $this->prefix = env('DB_SINTAX', ''); // prefijo dinámico desde .env
+    }
+
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create(env('DB_SINTAX') . 'users', function (Blueprint $table) {
+        Schema::create($this->prefix . 'users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
@@ -23,13 +30,13 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create(env('DB_SINTAX') . 'password_reset_tokens', function (Blueprint $table) { 
+        Schema::create($this->prefix . 'password_reset_tokens', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
         });
 
-        Schema::create(env('DB_SINTAX') . 'sessions', function (Blueprint $table) { 
+        Schema::create($this->prefix . 'sessions', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->foreignId('user_id')->nullable()->index();
             $table->string('ip_address', 45)->nullable();
@@ -44,8 +51,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists(env('DB_SINTAX') . 'users');
-        Schema::dropIfExists(env('DB_SINTAX') . 'password_reset_tokens');
-        Schema::dropIfExists(env('DB_SINTAX') . 'sessions');
+        Schema::dropIfExists($this->prefix . 'users');
+        Schema::dropIfExists($this->prefix . 'password_reset_tokens');
+        Schema::dropIfExists($this->prefix . 'sessions');
     }
 };

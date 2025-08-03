@@ -6,30 +6,31 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+    protected string $prefix;
+
+    public function __construct()
+    {
+        $this->prefix = env('DB_SINTAX', '');
+    }
+
     public function up(): void
     {
-        Schema::create(env('DB_SINTAX') . 'cache', function (Blueprint $table) {
+        Schema::create($this->prefix . 'cache', function (Blueprint $table) {
             $table->string('key')->primary();
             $table->mediumText('value');
             $table->integer('expiration');
         });
 
-        Schema::create(env('DB_SINTAX') . 'cache_locks', function (Blueprint $table) {
+        Schema::create($this->prefix . 'cache_locks', function (Blueprint $table) {
             $table->string('key')->primary();
             $table->string('owner');
             $table->integer('expiration');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists(env('DB_SINTAX') . 'cache');
-        Schema::dropIfExists(env('DB_SINTAX') . 'cache_locks');
+        Schema::dropIfExists($this->prefix . 'cache_locks');
+        Schema::dropIfExists($this->prefix . 'cache');
     }
 };

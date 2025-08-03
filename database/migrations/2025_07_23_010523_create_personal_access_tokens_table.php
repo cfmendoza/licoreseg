@@ -6,12 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    protected string $prefix;
+
+    public function __construct()
+    {
+        $this->prefix = env('DB_SINTAX', '');
+    }
+
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create(env('DB_SINTAX') . 'personal_access_tokens', function (Blueprint $table) {
+        Schema::create($this->prefix . 'personal_access_tokens', function (Blueprint $table) {
             $table->id();
             $table->morphs('tokenable');
             $table->text('name');
@@ -28,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists(env('DB_SINTAX') . 'personal_access_tokens');
+        Schema::dropIfExists($this->prefix . 'personal_access_tokens');
     }
 };

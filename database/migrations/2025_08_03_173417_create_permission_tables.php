@@ -13,11 +13,12 @@ return new class extends Migration
         $columnNames = config('permission.column_names');
         $pivotRole = $columnNames['role_pivot_key'] ?? 'role_id';
         $pivotPermission = $columnNames['permission_pivot_key'] ?? 'permission_id';
+        $tablePrefix = env('DB_SINTAX', ''); // 👈 aquí se aplica el prefijo
 
         throw_if(empty($tableNames), new Exception('Error: config/permission.php not loaded. Run [php artisan config:clear] and try again.'));
         throw_if($teams && empty($columnNames['team_foreign_key'] ?? null), new Exception('Error: team_foreign_key on config/permission.php not loaded. Run [php artisan config:clear] and try again.'));
 
-        Schema::create(env('DB_SINTAX') . $tableNames['permissions'], static function (Blueprint $table) {
+        Schema::create( $tableNames['permissions'], static function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
             $table->string('guard_name');
@@ -25,7 +26,7 @@ return new class extends Migration
             $table->unique(['name', 'guard_name']);
         });
 
-        Schema::create(env('DB_SINTAX') . $tableNames['roles'], static function (Blueprint $table) use ($teams, $columnNames) {
+        Schema::create( $tableNames['roles'], static function (Blueprint $table) use ($teams, $columnNames) {
             $table->bigIncrements('id');
             if ($teams || config('permission.testing')) {
                 $table->unsignedBigInteger($columnNames['team_foreign_key'])->nullable();
@@ -41,7 +42,7 @@ return new class extends Migration
             }
         });
 
-        Schema::create(env('DB_SINTAX') . $tableNames['model_has_permissions'], static function (Blueprint $table) use ($tableNames, $columnNames, $pivotPermission, $teams) {
+        Schema::create( $tableNames['model_has_permissions'], static function (Blueprint $table) use ($tableNames, $columnNames, $pivotPermission, $teams, $tablePrefix) {
             $table->unsignedBigInteger($pivotPermission);
             $table->string('model_type');
             $table->unsignedBigInteger($columnNames['model_morph_key']);
@@ -49,29 +50,22 @@ return new class extends Migration
 
             $table->foreign($pivotPermission)
                 ->references('id')
-                ->on(env('DB_SINTAX') . $tableNames['permissions'])
+                ->on( $tableNames['permissions'])
                 ->onDelete('cascade');
 
             if ($teams) {
                 $table->unsignedBigInteger($columnNames['team_foreign_key']);
                 $table->index($columnNames['team_foreign_key'], 'model_has_permissions_team_foreign_key_index');
 
-                $table->primary([
-                    $columnNames['team_foreign_key'],
-                    $pivotPermission,
-                    $columnNames['model_morph_key'],
-                    'model_type'
-                ], 'model_has_permissions_permission_model_type_primary');
+                $table->primary([$columnNames['team_foreign_key'], $pivotPermission, $columnNames['model_morph_key'], 'model_type'],
+                    'model_has_permissions_permission_model_type_primary');
             } else {
-                $table->primary([
-                    $pivotPermission,
-                    $columnNames['model_morph_key'],
-                    'model_type'
-                ], 'model_has_permissions_permission_model_type_primary');
+                $table->primary([$pivotPermission, $columnNames['model_morph_key'], 'model_type'],
+                    'model_has_permissions_permission_model_type_primary');
             }
         });
 
-        Schema::create(env('DB_SINTAX') . $tableNames['model_has_roles'], static function (Blueprint $table) use ($tableNames, $columnNames, $pivotRole, $teams) {
+        Schema::create( $tableNames['model_has_roles'], static function (Blueprint $table) use ($tableNames, $columnNames, $pivotRole, $teams, $tablePrefix) {
             $table->unsignedBigInteger($pivotRole);
             $table->string('model_type');
             $table->unsignedBigInteger($columnNames['model_morph_key']);
@@ -79,40 +73,33 @@ return new class extends Migration
 
             $table->foreign($pivotRole)
                 ->references('id')
-                ->on(env('DB_SINTAX') . $tableNames['roles'])
+                ->on( $tableNames['roles'])
                 ->onDelete('cascade');
 
             if ($teams) {
                 $table->unsignedBigInteger($columnNames['team_foreign_key']);
                 $table->index($columnNames['team_foreign_key'], 'model_has_roles_team_foreign_key_index');
 
-                $table->primary([
-                    $columnNames['team_foreign_key'],
-                    $pivotRole,
-                    $columnNames['model_morph_key'],
-                    'model_type'
-                ], 'model_has_roles_role_model_type_primary');
+                $table->primary([$columnNames['team_foreign_key'], $pivotRole, $columnNames['model_morph_key'], 'model_type'],
+                    'model_has_roles_role_model_type_primary');
             } else {
-                $table->primary([
-                    $pivotRole,
-                    $columnNames['model_morph_key'],
-                    'model_type'
-                ], 'model_has_roles_role_model_type_primary');
+                $table->primary([$pivotRole, $columnNames['model_morph_key'], 'model_type'],
+                    'model_has_roles_role_model_type_primary');
             }
         });
 
-        Schema::create(env('DB_SINTAX') . $tableNames['role_has_permissions'], static function (Blueprint $table) use ($tableNames, $pivotRole, $pivotPermission) {
+        Schema::create( $tableNames['role_has_permissions'], static function (Blueprint $table) use ($tableNames, $pivotRole, $pivotPermission, $tablePrefix) {
             $table->unsignedBigInteger($pivotPermission);
             $table->unsignedBigInteger($pivotRole);
 
             $table->foreign($pivotPermission)
                 ->references('id')
-                ->on(env('DB_SINTAX') . $tableNames['permissions'])
+                ->on( $tableNames['permissions'])
                 ->onDelete('cascade');
 
             $table->foreign($pivotRole)
                 ->references('id')
-                ->on(env('DB_SINTAX') . $tableNames['roles'])
+                ->on( $tableNames['roles'])
                 ->onDelete('cascade');
 
             $table->primary([$pivotPermission, $pivotRole], 'role_has_permissions_permission_id_role_id_primary');
@@ -126,15 +113,16 @@ return new class extends Migration
     public function down(): void
     {
         $tableNames = config('permission.table_names');
+        $tablePrefix = env('DB_SINTAX', '');
 
         if (empty($tableNames)) {
             throw new \Exception('Error: config/permission.php not found and defaults could not be merged. Please publish the package configuration before proceeding, or drop the tables manually.');
         }
 
-        Schema::drop(env('DB_SINTAX') . $tableNames['role_has_permissions']);
-        Schema::drop(env('DB_SINTAX') . $tableNames['model_has_roles']);
-        Schema::drop(env('DB_SINTAX') . $tableNames['model_has_permissions']);
-        Schema::drop(env('DB_SINTAX') . $tableNames['roles']);
-        Schema::drop(env('DB_SINTAX') . $tableNames['permissions']);
+        Schema::drop( $tableNames['role_has_permissions']);
+        Schema::drop( $tableNames['model_has_roles']);
+        Schema::drop( $tableNames['model_has_permissions']);
+        Schema::drop( $tableNames['roles']);
+        Schema::drop( $tableNames['permissions']);
     }
 };

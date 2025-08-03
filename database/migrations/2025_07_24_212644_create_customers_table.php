@@ -6,12 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    protected string $prefix;
+
+    public function __construct()
+    {
+        $this->prefix = env('DB_SINTAX', '');
+    }
+
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create(env('DB_SINTAX') . 'customers', function (Blueprint $table) {
+        Schema::create($this->prefix . 'customers', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('phone')->nullable();
@@ -20,7 +27,6 @@ return new class extends Migration
             $table->string('city')->nullable();
             $table->timestamps();
         });
-
     }
 
     /**
@@ -28,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists(env('DB_SINTAX') . 'customers');
+        Schema::dropIfExists($this->prefix . 'customers');
     }
 };
