@@ -44,6 +44,10 @@ COPY --from=node /app/public/build ./public/build
 # Instala dependencias PHP
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
+
+# Instalar dependencias Node y construir los assets
+RUN npm install && npm run build
+
 # Permisos
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
