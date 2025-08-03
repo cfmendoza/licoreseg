@@ -39,6 +39,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('ventas', SalesController::class);
     Route::get('ventas/data', [SalesController::class, 'dataTableSales'])->name('ventas.data');
     Route::post('ventas/{sale}/send-invoice', [SalesController::class, 'sendInvoice'])->name('ventas.send_invoice');
+    Route::get('/ventas/{sale}/descargar-pdf', [SalesController::class, 'downloadPdf'])->name('ventas.download_pdf');
+
 
 
 

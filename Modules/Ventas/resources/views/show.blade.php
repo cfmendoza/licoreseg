@@ -6,13 +6,19 @@
 <div class="container py-4">
     <div class="card shadow-sm mb-4">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Factura #{{ $sale->id }}</h5>
-            <!-- Botón para enviar por correo -->
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#sendInvoiceModal">
-                <i class="bi bi-envelope-fill"></i> Enviar factura por correo
-            </button>
+    <h5 class="mb-0">Factura #{{ $sale->id }}</h5>
+    
+    <div>
+        <a href="{{ route('ventas.download_pdf', $sale->id) }}" class="btn btn-outline-light me-2">
+            <i class="bi bi-file-earmark-arrow-down-fill"></i> Descargar PDF
+        </a>
 
-        </div>
+        <button class="btn btn-outline-light" data-bs-toggle="modal" data-bs-target="#sendInvoiceModal">
+            <i class="bi bi-envelope-fill"></i> Enviar factura por correo
+        </button>
+    </div>
+</div>
+
         <div class="card-body">
             <p><strong>Cliente:</strong> {{ $sale->customer->name ?? '—' }}</p>
             <p><strong>Fecha:</strong> {{ \Carbon\Carbon::parse($sale->date)->format('d/m/Y') }}</p>

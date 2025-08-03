@@ -11,13 +11,17 @@
             margin: 20px;
         }
 
-        h2 {
+        h1, h2, h4 {
             margin-bottom: 5px;
             color: #222;
         }
 
         p {
             margin: 2px 0;
+        }
+
+        .business-info, .customer-info {
+            margin-bottom: 15px;
         }
 
         table {
@@ -44,10 +48,24 @@
     </style>
 </head>
 <body>
-    <h2>Factura #{{ $sale->id }}</h2>
-    <p><strong>Cliente:</strong> {{ $sale->customer->name ?? '—' }}</p>
-    <p><strong>Fecha:</strong> {{ \Carbon\Carbon::parse($sale->date)->format('d/m/Y') }}</p>
 
+    {{-- Información del negocio --}}
+    <div class="business-info">
+        <h1>{{ env('BUSINESS_NAME') }}</h1>
+        <p><strong>NIT:</strong> {{ env('BUSINESS_NIT') }}</p>
+        <p><strong>Representante Legal:</strong> {{ env('BUSINESS_OWNER') }}</p>
+        <p><strong>Teléfono:</strong> {{ env('BUSINESS_PHONE') }}</p>
+        <p><strong>Dirección:</strong> {{ env('BUSINESS_ADDRESS') }}</p>
+    </div>
+
+    {{-- Información de la factura --}}
+    <h2>Factura #{{ $sale->id }}</h2>
+    <div class="customer-info">
+        <p><strong>Cliente:</strong> {{ $sale->customer->name ?? '—' }}</p>
+        <p><strong>Fecha:</strong> {{ \Carbon\Carbon::parse($sale->date)->format('d/m/Y') }}</p>
+    </div>
+
+    {{-- Detalle de productos --}}
     <h4>Detalle de productos</h4>
     <table>
         <thead>

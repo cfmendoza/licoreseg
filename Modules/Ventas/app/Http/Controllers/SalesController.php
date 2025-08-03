@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleDetail;
 use App\Notifications\InvoiceSend;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
@@ -168,6 +169,15 @@ public function sendInvoice(Request $request, $id)
 
     $sale = Sale::with(['customer', 'details.product'])->findOrFail($id);
 
+    // Datos del negocio desde .env
+    $business = [
+        'name' => env('BUSINESS_NAME'),
+        'nit' => env('BUSINESS_NIT'),
+        'owner' => env('BUSINESS_OWNER'),
+        'phone' => env('BUSINESS_PHONE'),
+        'address' => env('BUSINESS_ADDRESS'),
+    ];
+
     // Crear un destinatario anónimo con solo un correo
     $recipient = (object)[
         'email' => $request->email,
@@ -176,9 +186,31 @@ public function sendInvoice(Request $request, $id)
     ];
 
     Notification::route('mail', $request->email)
-        ->notify(new InvoiceSend($sale));
+        ->notify(new InvoiceSend($sale, $business));
 
     return redirect()->route('ventas.index')->with('success', 'Factura enviada correctamente.');
+}
+
+
+
+public function downloadPdf($id)
+{
+    $sale = Sale::with(['customer', 'details.product'])->findOrFail($id);
+
+    $business = [
+        'name' => env('BUSINESS_NAME'),
+        'nit' => env('BUSINESS_NIT'),
+        'owner' => env('BUSINESS_OWNER'),
+        'phone' => env('BUSINESS_PHONE'),
+        'address' => env('BUSINESS_ADDRESS'),
+    ];
+
+    $pdf = Pdf::loadView('ventas::pdf.invoice', [
+        'sale' => $sale,
+        'business' => $business,
+    ]);
+
+    return $pdf->download('factura_' . $sale->id . '.pdf');
 }
 
 
