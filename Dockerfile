@@ -3,17 +3,17 @@ FROM node:20 as node
 
 WORKDIR /app
 
-# Copiar config y dependencias
-COPY package*.json vite.config.js ./
-COPY tailwind.config.js postcss.config.js ./
+# Copiar configuraciones necesarias para Vite
+COPY package*.json vite.config.js ./ 
+COPY tailwind.config.js postcss.config.js ./ 
 
 RUN npm install
 
-# Copiar archivos necesarios para compilar assets
+# Copiar recursos para compilar
 COPY resources ./resources
 COPY public ./public
 
-# Compilar los assets (Vite)
+# Compilar assets
 RUN npm run build
 
 # -------------------------------------------------------------------------
@@ -21,44 +21,42 @@ RUN npm run build
 # Etapa 2: PHP con Apache
 FROM php:8.2-apache
 
-# Instalar dependencias necesarias para Laravel
+# Instalar dependencias necesarias de PHP
 RUN apt-get update && apt-get install -y \
     git unzip zip curl libzip-dev libpng-dev libonig-dev libxml2-dev \
     libpq-dev libjpeg-dev libfreetype6-dev \
     && docker-php-ext-install pdo pdo_mysql zip gd
 
-# Habilitar mod_rewrite para Laravel
+# Habilitar mod_rewrite de Apache
 RUN a2enmod rewrite
 
 # Instalar Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Definir directorio de trabajo
+# Establecer directorio de trabajo
 WORKDIR /var/www/html
 
-# Copiar el proyecto completo (código PHP, rutas, etc.)
+# Copiar proyecto completo, incluyendo .env
 COPY . .
+COPY .env .env
 
-# Crear archivo de base de datos SQLite si es necesario
-RUN mkdir -p database && touch database/database.sqlite
-
-# Copiar assets construidos desde la etapa de Node
+# Copiar assets ya construidos desde etapa Node
 COPY --from=node /app/public/build ./public/build
 
 # Instalar dependencias de Laravel
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Limpiar cachés de Laravel para evitar errores
+# Verificar conexión y limpiar cachés
 RUN php artisan config:clear && \
     php artisan cache:clear && \
     php artisan view:clear && \
     php artisan route:clear
 
-# Dar permisos adecuados a Laravel
+# Permisos para Laravel
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
-# Configurar Apache para servir desde /public
+# Configuración del VirtualHost de Apache
 RUN echo '<VirtualHost *:80>\n\
     DocumentRoot /var/www/html/public\n\
     <Directory /var/www/html/public>\n\
