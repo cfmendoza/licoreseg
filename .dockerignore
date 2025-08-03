@@ -1,0 +1,36 @@
+# Ignorar entorno y config locales
+.env
+.env.* 
+.env.local
+
+# Node
+node_modules
+npm-debug.log
+yarn.lock
+
+# Laravel
+vendor
+storage/*.key
+storage/oauth-private.key
+storage/oauth-public.key
+storage/debugbar
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/logs/*
+
+# IDEs y sistemas
+*.log
+*.swp
+*.swo
+*.bak
+*.tmp
+.DS_Store
+.idea/
+.vscode/
+*.iml
+
+# Git
+.git
+.gitignore
+.gitattributes

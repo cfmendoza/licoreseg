@@ -36,9 +36,8 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Establecer directorio de trabajo
 WORKDIR /var/www/html
 
-# Copiar proyecto completo, incluyendo .env
+# Copiar proyecto completo (excluye .env, Render usa variables de entorno)
 COPY . .
-COPY .env .env
 
 # Copiar assets ya construidos desde etapa Node
 COPY --from=node /app/public/build ./public/build
@@ -46,11 +45,11 @@ COPY --from=node /app/public/build ./public/build
 # Instalar dependencias de Laravel
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Verificar conexión y limpiar cachés
+# Limpiar cachés (Render inyecta el .env en tiempo de ejecución)
 RUN php artisan config:clear && \
     php artisan cache:clear && \
     php artisan view:clear && \
-    php artisan route:clear
+    php artisan route:clear || true
 
 # Permisos para Laravel
 RUN chown -R www-data:www-data /var/www/html \
