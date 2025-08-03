@@ -1,58 +1,61 @@
-# Etapa 1: Compilar assets con Node
+# Etapa 1: Construir assets con Node
 FROM node:20 as node
 
 WORKDIR /app
 
-# Copia los archivos de Vite
+# Copiar config y dependencias
 COPY package*.json vite.config.js ./
+COPY tailwind.config.js postcss.config.js ./
+
 RUN npm install
 
-# Copia el resto del proyecto (para acceder a los CSS/JS)
+# Copiar archivos necesarios para compilar assets
 COPY resources ./resources
 COPY public ./public
 
-# Si tienes Tailwind o Vue, copia también:
-COPY tailwind.config.js ./
-COPY postcss.config.js ./
-
-# Compila los assets
+# Compilar los assets (Vite)
 RUN npm run build
 
+# -------------------------------------------------------------------------
 
-# Etapa 2: Imagen final con Apache y PHP
+# Etapa 2: PHP con Apache
 FROM php:8.2-apache
 
-# Instala extensiones PHP necesarias
+# Instalar dependencias necesarias para Laravel
 RUN apt-get update && apt-get install -y \
-    git unzip zip curl libzip-dev libpng-dev libonig-dev libxml2-dev libpq-dev libjpeg-dev libfreetype6-dev \
+    git unzip zip curl libzip-dev libpng-dev libonig-dev libxml2-dev \
+    libpq-dev libjpeg-dev libfreetype6-dev \
     && docker-php-ext-install pdo pdo_mysql zip gd
 
-# Habilita mod_rewrite
+# Habilitar mod_rewrite para Laravel
 RUN a2enmod rewrite
 
-# Instala Composer
+# Instalar Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+# Definir directorio de trabajo
 WORKDIR /var/www/html
 
-# Copia todo el proyecto
+# Copiar el proyecto completo (código PHP, rutas, etc.)
 COPY . .
 
-# Copia los assets construidos en la etapa anterior
+# Copiar assets construidos desde la etapa de Node
 COPY --from=node /app/public/build ./public/build
 
-# Instala dependencias PHP
+# Instalar dependencias de Laravel
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
+# Limpiar cachés de Laravel para evitar errores
+RUN php artisan config:clear && \
+    php artisan cache:clear && \
+    php artisan view:clear && \
+    php artisan route:clear
 
-# Instalar dependencias Node y construir los assets
-RUN npm install && npm run build
-
-# Permisos
+# Dar permisos adecuados a Laravel
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
-# Configura el VirtualHost de Apache
+# Configurar Apache para servir desde /public
 RUN echo '<VirtualHost *:80>\n\
     DocumentRoot /var/www/html/public\n\
     <Directory /var/www/html/public>\n\
