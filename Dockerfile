@@ -4,8 +4,8 @@ FROM node:20 as node
 WORKDIR /app
 
 # Copiar configuraciones necesarias para Vite
-COPY package*.json vite.config.js ./ 
-COPY tailwind.config.js postcss.config.js ./ 
+COPY package*.json vite.config.js ./
+COPY tailwind.config.js postcss.config.js ./
 
 RUN npm install
 
@@ -45,11 +45,14 @@ COPY --from=node /app/public/build ./public/build
 # Instalar dependencias de Laravel
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Limpiar cachés (Render inyecta el .env en tiempo de ejecución)
+# Limpiar cachés de Laravel
 RUN php artisan config:clear && \
     php artisan cache:clear && \
     php artisan view:clear && \
     php artisan route:clear || true
+
+# Crear symlink para que /storage apunte a storage/app/public
+RUN php artisan storage:link
 
 # Permisos para Laravel
 RUN chown -R www-data:www-data /var/www/html \
