@@ -39,6 +39,9 @@ WORKDIR /var/www/html
 # Copiar el proyecto completo (código PHP, rutas, etc.)
 COPY . .
 
+# Crear archivo de base de datos SQLite si es necesario
+RUN mkdir -p database && touch database/database.sqlite
+
 # Copiar assets construidos desde la etapa de Node
 COPY --from=node /app/public/build ./public/build
 
