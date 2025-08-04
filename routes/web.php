@@ -11,8 +11,7 @@ use Modules\Reportes\Http\Controllers\ReportsController;
 use Modules\Usuarios\Http\Controllers\UsersController;
 use Modules\Ventas\Http\Controllers\CustomerController;
 use Modules\Ventas\Http\Controllers\SalesController;
-
-
+use Spatie\Permission\PermissionRegistrar;
 
 Route::get('/', [LoginController::class, 'showLoginForm'])
     ->name('login');
@@ -55,4 +54,9 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/products-get', [InventarioController::class, 'getProducts'])->name('products.get');
     Route::get('/usuarios-get', [UsersController::class, 'getUsuarios'])->name('usuarios.get');
+
+    Route::get('/reset-permissions', function () {
+    app()[PermissionRegistrar::class]->forgetCachedPermissions();
+    return 'Permisos recargados';
+});
 });
