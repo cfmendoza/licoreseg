@@ -5,9 +5,15 @@
 @section('content')
 <div class="container py-4">
   <h1 class="mb-4">Editar Usuario</h1>
-  <form action="{{ route('usuarios.update', $user) }}" method="POST">
-    @method('PUT')
-    @include('usuarios::form')
-  </form>
+ <form class="edit-user-form" data-id="{{ $user->id }}">
+  @csrf
+  @method('PUT')
+  @include('usuarios::form')
+</form>
+
 </div>
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/users.js') }}"></script>
+@endpush

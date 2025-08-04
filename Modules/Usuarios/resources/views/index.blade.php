@@ -22,7 +22,7 @@
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
+            <table class="table table-hover align-middle mb-0" id="tabla-usuarios">
               <thead class="table-light">
                 <tr>
                   <th>#</th>
@@ -34,32 +34,28 @@
               </thead>
               <tbody>
                 @forelse($users as $u)
-                  <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $u->name }}</td>
-                    <td>{{ $u->email }}</td>
-                    <td>
-                      @foreach($u->getRoleNames() as $role)
-                        <span class="badge bg-secondary">{{ $role }}</span>
-                      @endforeach
-                    </td>
-                    <td>
-                      <a href="{{ route('usuarios.edit', $u) }}" class="btn btn-sm btn-warning">
-                        <i class="bi bi-pencil"></i>
-                      </a>
-                      <form action="{{ route('usuarios.destroy', $u) }}" method="POST" class="d-inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este usuario?')">
-                          <i class="bi bi-trash"></i>
-                        </button>
-                      </form>
-                    </td>
-                  </tr>
+                <tr>
+                  <td>{{ $loop->iteration }}</td>
+                  <td>{{ $u->name }}</td>
+                  <td>{{ $u->email }}</td>
+                  <td>
+                    @foreach($u->getRoleNames() as $role)
+                    <span class="badge bg-secondary">{{ $role }}</span>
+                    @endforeach
+                  </td>
+                  <td>
+                    <a href="{{ route('usuarios.edit', $u) }}" class="btn btn-sm btn-warning">
+                      <i class="bi bi-pencil"></i>
+                    </a>
+                    <button class="btn btn-sm btn-danger btn-delete-user" data-id="{{ $u->id }}">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
                 @empty
-                  <tr>
-                    <td colspan="5" class="text-center text-muted py-3">No hay usuarios registrados.</td>
-                  </tr>
+                <tr>
+                  <td colspan="5" class="text-center text-muted py-3">No hay usuarios registrados.</td>
+                </tr>
                 @endforelse
               </tbody>
             </table>
@@ -76,33 +72,47 @@
         </div>
         <div class="card-body">
           @forelse($roles as $role)
-            <div class="mb-2">
-              <strong class="text-dark">{{ $role->name }}</strong>
-              <div>
-                @if($role->permissions->isNotEmpty())
-                  @foreach($role->permissions as $perm)
-                    <span class="badge bg-info text-dark mb-1">{{ $perm->name }}</span>
-                  @endforeach
-                @else
-                  <small class="text-muted">Sin permisos</small>
-                @endif
-              </div>
+          <div class="mb-2">
+            <strong class="text-dark">{{ $role->name }}</strong>
+            <div>
+              @if($role->permissions->isNotEmpty())
+              @foreach($role->permissions as $perm)
+              <span class="badge bg-info text-dark mb-1">{{ $perm->name }}</span>
+              @endforeach
+              @else
+              <small class="text-muted">Sin permisos</small>
+              @endif
             </div>
+          </div>
           @empty
-            <p class="text-muted">No hay roles definidos.</p>
+          <p class="text-muted">No hay roles definidos.</p>
           @endforelse
         </div>
       </div>
 
-      <div class="d-grid gap-2">
-        <a href="{{ route('roles.index') }}" class="btn btn-outline-primary btn-sm">
+<!--       <div class="d-grid gap-2">
+        {{-- Botón para nuevo rol --}}
+        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreateRole">
+          <i class="bi bi-plus-circle"></i> Nuevo Rol
+        </button>
+
+        {{-- Botón para gestionar roles (abre listado con editar/eliminar) --}}
+        <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalManageRoles">
           <i class="bi bi-shield-lock"></i> Gestionar Roles
-        </a>
-        <a href="{{ route('permissions.index') }}" class="btn btn-outline-secondary btn-sm">
-          <i class="bi bi-key"></i> Gestionar Permisos
-        </a>
-      </div>
+        </button>
+
+        {{-- Botón para crear nuevo permiso --}}
+        <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modalCreatePermission">
+          <i class="bi bi-key"></i> Nuevo Permiso
+        </button>
+      </div> -->
+
     </div>
   </div>
 </div>
+
 @endsection
+
+@push('scripts')
+<script src="{{ asset('js/users.js') }}"></script>
+@endpush

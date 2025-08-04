@@ -27,7 +27,7 @@
   </select>
 </div>
 
-<button type="submit" class="btn btn-primary">
+<button type="submit" class="btn btn-primary" >
   <i class="bi bi-save"></i> Guardar
 </button>
 <a href="{{ route('usuarios.index') }}" class="btn btn-secondary">Cancelar</a>

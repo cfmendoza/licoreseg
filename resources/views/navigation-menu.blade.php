@@ -6,26 +6,49 @@
       <div class="flex items-center space-x-6">
         <img src="{{ asset('images/fondo.png') }}" alt="Logo" class="w-13 h-14">
 
-        @php 
-        use Illuminate\Support\Facades\Auth;
+        @php
+            use Illuminate\Support\Facades\Auth;
         @endphp
-
         @auth
-        @foreach ([
-        ['route'=>'ventas.index','label'=>'Ventas'],
-        ['route'=>'inventario.index','label'=>'Inventario'],
-        ['route'=>'reportes.index','label'=>'Reportes'],
-        ['route'=>'usuarios.index','label'=>'Usuarios'],
-        ] as $item)
-        <a href="{{ route($item['route']) }}"
-          @class([ 'px-3 py-2 rounded-md text-sm font-medium transition' ,
-          request()->routeIs($item['route'])
-          ? 'bg-gray-900 text-white'
-          : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
-          ])>
-          {{ $item['label'] }}
-        </a>
-        @endforeach
+          @can('ventas')
+            <a href="{{ route('ventas.index') }}"
+              @class([
+                'px-3 py-2 rounded-md text-sm font-medium transition',
+                request()->routeIs('ventas.index') ? 'bg-gray-900 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+              ])>
+              Ventas
+            </a>
+          @endcan
+
+          @can('inventarios')
+            <a href="{{ route('inventario.index') }}"
+              @class([
+                'px-3 py-2 rounded-md text-sm font-medium transition',
+                request()->routeIs('inventario.index') ? 'bg-gray-900 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+              ])>
+              Inventario
+            </a>
+          @endcan
+
+          @can('reportes')
+            <a href="{{ route('reportes.index') }}"
+              @class([
+                'px-3 py-2 rounded-md text-sm font-medium transition',
+                request()->routeIs('reportes.index') ? 'bg-gray-900 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+              ])>
+              Reportes
+            </a>
+          @endcan
+
+          @can('usuarios')
+            <a href="{{ route('usuarios.index') }}"
+              @class([
+                'px-3 py-2 rounded-md text-sm font-medium transition',
+                request()->routeIs('usuarios.index') ? 'bg-gray-900 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+              ])>
+              Usuarios
+            </a>
+          @endcan
         @endauth
       </div>
 
@@ -59,21 +82,46 @@
   <div :class="{ 'block': open, 'hidden': !open }" class="sm:hidden bg-gray-800">
     @auth
     <div class="px-4 pt-4 pb-2 space-y-1">
-      @foreach ([
-      ['route'=>'ventas.index','label'=>'Ventas'],
-      ['route'=>'inventario.index','label'=>'Inventario'],
-      ['route'=>'reportes.index','label'=>'Reportes'],
-      ['route'=>'usuarios.index','label'=>'Usuarios'],
-      ] as $item)
-      <a href="{{ route($item['route']) }}"
-        @class([ 'block px-3 py-2 rounded-md text-base font-medium transition' ,
-        request()->routeIs($item['route'])
-        ? 'bg-gray-900 text-white'
-        : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
-        ])>
-        {{ $item['label'] }}
-      </a>
-      @endforeach
+
+      @can('ventas')
+        <a href="{{ route('ventas.index') }}"
+          @class([
+            'block px-3 py-2 rounded-md text-base font-medium transition',
+            request()->routeIs('ventas.index') ? 'bg-gray-900 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+          ])>
+          Ventas
+        </a>
+      @endcan
+
+      @can('inventarios')
+        <a href="{{ route('inventario.index') }}"
+          @class([
+            'block px-3 py-2 rounded-md text-base font-medium transition',
+            request()->routeIs('inventario.index') ? 'bg-gray-900 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+          ])>
+          Inventario
+        </a>
+      @endcan
+
+      @can('reportes')
+        <a href="{{ route('reportes.index') }}"
+          @class([
+            'block px-3 py-2 rounded-md text-base font-medium transition',
+            request()->routeIs('reportes.index') ? 'bg-gray-900 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+          ])>
+          Reportes
+        </a>
+      @endcan
+
+      @can('usuarios')
+        <a href="{{ route('usuarios.index') }}"
+          @class([
+            'block px-3 py-2 rounded-md text-base font-medium transition',
+            request()->routeIs('usuarios.index') ? 'bg-gray-900 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600 hover:text-white'
+          ])>
+          Usuarios
+        </a>
+      @endcan
 
       <form method="POST" action="{{ route('logout') }}" class="mt-2">
         @csrf

@@ -17,8 +17,8 @@ class UsersController extends Controller
     {
         $users = User::all(); 
         $roles = Role::all(); 
-        $permisos = Permission::all();
-        return view('usuarios::index', compact('users', 'roles', 'permisos'));
+        $permissions = Permission::all();
+        return view('usuarios::index', compact('users', 'roles', 'permissions'));
 
     }
 
@@ -47,14 +47,48 @@ public function edit(User $usuario)
     ]);
 }
 
-
-public function update(Request $request, User $user)
+public function update(Request $request, $id)
 {
-    $user->update($request->only('name', 'email'));
+    $data = $request->only('name', 'email');
+
     if ($request->filled('password')) {
-        $user->update(['password' => bcrypt($request->password)]);
+        $data['password'] = bcrypt($request->password);
     }
-    $user->syncRoles($request->roles);
-    return redirect()->route('usuarios::index')->with('success', 'Usuario actualizado.');
+
+    $user = User::findOrFail($id); // ← Aquí estaba el problema
+    $user->update($data);
+
+    if ($request->has('roles')) {
+        $user->syncRoles($request->roles);
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Usuario actualizado'
+    ]);
 }
+
+
+public function destroy($id)
+{
+    $user = User::findOrFail($id);
+
+    // Evita que se elimine a sí mismo
+    if (auth()->id() == $user->id) {
+        return response()->json([
+            'success' => false,
+            'message' => 'No puedes eliminar tu propio usuario.'
+        ], 403);
+    }
+
+    // Elimina el usuario
+    $user->delete();
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Usuario eliminado correctamente.'
+    ]);
+}
+
+
 }
