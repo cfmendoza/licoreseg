@@ -32,10 +32,12 @@ class LoginController extends Controller
             $user = Auth::user();
 
             // Redireccionar según el rol
-            if ($user->role === 'admin') {
+            if ($user->role === 'Admin') {
                 return redirect()->route('ventas.index');
-            } elseif ($user->role === 'vendedor') {
+            } elseif ($user->role === 'Vendedor') {
                 return redirect()->route('ventas.index');
+            } elseif ($user->role === 'Almacenista') {
+                return redirect()->route('categories.index');
             } else {
                 return redirect()->route('ventas.index');
             }
