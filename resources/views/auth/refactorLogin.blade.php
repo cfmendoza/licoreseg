@@ -32,14 +32,6 @@
         @enderror
       </div>
 
-      <div class="flex items-center justify-between">
-        <label class="flex items-center text-sm">
-          <input type="checkbox" name="remember" class="mr-2 text-blue-500 focus:ring-blue-500">
-          Recuérdame
-        </label>
-        <a href="{{ route('password.request') }}" class="text-sm text-blue-600 hover:underline">¿Olvidaste tu contraseña?</a>
-      </div>
-
       <div>
         <button type="submit"
                 class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-md transition">

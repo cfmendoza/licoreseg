@@ -29,18 +29,7 @@ class LoginController extends Controller
         if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
 
-            $user = Auth::user();
-
-            // Redireccionar según el rol
-            if ($user->role === 'Admin') {
-                return redirect()->route('ventas.index');
-            } elseif ($user->role === 'Vendedor') {
-                return redirect()->route('ventas.index');
-            } elseif ($user->role === 'Almacenista') {
-                return redirect()->route('categories.index');
-            } else {
-                return redirect()->route('ventas.index');
-            }
+            return redirect()->route('ventas.index');
         }
 
         return back()
