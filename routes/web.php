@@ -37,7 +37,7 @@ Route::post('logout', [LoginController::class, 'logout'])
 
 
 Route::middleware(['auth'])->group(function () {
-    Route::middleware(['can:ventas'])->group(function () {
+    //Route::middleware(['can:ventas'])->group(function () {
         Route::resource('ventas', SalesController::class);
         Route::get('ventas/data', [SalesController::class, 'dataTableSales'])->name('ventas.data');
         Route::post('ventas/{sale}/send-invoice', [SalesController::class, 'sendInvoice'])->name('ventas.send_invoice');
@@ -45,27 +45,27 @@ Route::middleware(['auth'])->group(function () {
         Route::get('clients-get', [SalesController::class, 'getClientes']);
         Route::post('/customers', [CustomerController::class, 'store']);
         Route::get('/inventario', [SalesController::class, 'index'])->name('inventario.index');
-    });
+    //});
 
 
 
-    Route::middleware(['can:inventarios'])->group(function () {
+    //Route::middleware(['can:inventarios'])->group(function () {
         Route::resource('categories', ProductController::class);
         Route::post('/categorias', [CategoryController::class, 'store'])->name('categories.store');
-    });
+    //});
 
 
     Route::resource('products', ProductController::class);
 
 
-    Route::middleware(['can:reportes'])->group(function () {
+    //Route::middleware(['can:reportes'])->group(function () {
         Route::get('/reportes', [ReportsController::class, 'index'])->name('reportes.index');
         Route::resource('reports', ReportsController::class);
         Route::get('/reports-get', [ReportsController::class, 'getReports'])->name('reports.get');
         Route::get('/reportes/export', [ReportsController::class, 'export'])->name('reportes.export');
         Route::get('/reportes', [ReportsController::class, 'index'])->name('reportes.index');
         Route::get('/reportes/export-pdf', [ReportsController::class, 'exportPdf'])->name('reportes.export_pdf');
-    });
+   // });
 
     Route::resource('usuarios', UsersController::class);
     Route::resource('roles', UsersController::class);
